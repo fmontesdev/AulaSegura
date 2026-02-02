@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, Pressable, ListRenderItem } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, Pressable } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useAppTheme } from '../theme';
 import { StyledCard } from './StyledCard';
@@ -88,7 +88,7 @@ export function DataTable<T>({
           data={sortedData}
           keyExtractor={keyExtractor}
           ListHeaderComponent={() => (
-            <View style={[styles.tableHeader, { backgroundColor: theme.colors.secondary }]}>
+            <View style={[styles.tableHeader, { backgroundColor: theme.colors.tertiary }]}>
               {columns.map((column) => {
                 const isActive = sortField === column.key;
                 const isHovered = hoveredColumn === column.key;

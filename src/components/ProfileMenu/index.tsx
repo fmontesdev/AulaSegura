@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import { Text, Menu, Avatar } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../theme';
 import { addOpacity } from '../../utils/colorUtils';

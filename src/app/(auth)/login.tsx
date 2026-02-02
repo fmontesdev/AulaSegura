@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Image, Pressable } from 'react-native';
-import { TextInput, Button, Text, HelperText, Snackbar } from 'react-native-paper';
+import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppTheme } from '../../theme';
 import { useAuth } from '../../hooks/useAuth';
 import { LoginSchema, LoginFormValues } from '../../schemas/auth.schema';
+import { StyledSnackbar } from '../../components/StyledSnackbar';
 import { loginStyles as styles } from './login.styles';
 
 // Pantalla de login, ruta: /login
@@ -183,18 +184,18 @@ export default function LoginScreen() {
       </View>
 
       {/* Snackbar para mostrar mensajes de error */}
-      <Snackbar
+      <StyledSnackbar
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
+        message={snackbarMessage}
+        variant="error"
         duration={3000}
         action={{
           label: 'Cerrar',
           onPress: () => setSnackbarVisible(false),
         }}
-        style={styles.snackbar}
-      >
-        {snackbarMessage}
-      </Snackbar>
+        usePortal={false}
+      />
     </SafeAreaView>
   );
 }

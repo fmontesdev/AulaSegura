@@ -1,36 +1,53 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, Avatar, ActivityIndicator, FAB, IconButton, Portal, Dialog, Button } from 'react-native-paper';
+import { View } from 'react-native';
+import { Text, Avatar, ActivityIndicator, IconButton, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../../theme';
 import { useUsers, useDeleteUser } from '../../../hooks/queries/useUsers';
 import { API_CONFIG } from '../../../constants';
 import { StyledChip } from '../../../components/StyledChip';
-import { DataTable, ColumnConfig } from '../../../components/DataTable';
-import { User } from '../../../types/User';
+import { DataTable } from '../../../components/DataTable';
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
+import { User, RoleName } from '../../../types/User';
+import { getRoleLabel, getRoleColor } from '../../../utils/roleUtils';
+import { getUsersColumns } from './columns.config.users';
+import { styles } from './users.styles';
 
 // Pantalla de gestión de usuarios
 export default function UsersScreen() {
   const theme = useAppTheme();
+  const router = useRouter();
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   // Hook de TanStack Query para obtener todos los usuarios
   const { data: users, isLoading, error, isFetching, refetch } = useUsers();
+  const deleteUser = useDeleteUser();
 
-  const getRoleLabel = (roles: string[]) => {
-    const roleMap: Record<string, string> = {
-      admin: 'Administrador',
-      teacher: 'Profesor',
-      janitor: 'Conserje',
-      support_staff: 'Staff',
-    };
-    return roles.map(role => roleMap[role] || role).join(', ');
+  const handleEdit = (user: User) => {
+    router.push(`/users/${user.userId}`);
   };
 
-  const getRoleColor = (roles: string[]) => {
-    if (roles.includes('admin')) return theme.colors.error;
-    if (roles.includes('teacher')) return theme.colors.tertiary;
-    if (roles.includes('janitor')) return theme.colors.primary;
-    return theme.colors.grey;
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setDeleteDialogVisible(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await deleteUser.mutateAsync(userToDelete.userId);
+      setDeleteDialogVisible(false);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogVisible(false);
+    setUserToDelete(null);
   };
 
   const isUserActive = (user: User) => {
@@ -40,38 +57,7 @@ export default function UsersScreen() {
     return validTo > now;
   };
 
-  const columns: ColumnConfig<User>[] = [
-    {
-      key: 'name',
-      label: 'Usuario',
-      flex: 1.5,
-      sortKey: (user) => `${user.name} ${user.lastname}`,
-    },
-    {
-      key: 'email',
-      label: 'Email',
-      flex: 1,
-      sortKey: 'email',
-    },
-    {
-      key: 'role',
-      label: 'Rol',
-      flex: 1,
-      sortKey: (user) => getRoleLabel(user.roles),
-    },
-    {
-      key: 'department',
-      label: 'Departamento',
-      flex: 1,
-      sortKey: (user) => user.department?.name || '',
-    },
-    {
-      key: 'status',
-      label: 'Estado',
-      flex: 0.5,
-      sortKey: (user) => isUserActive(user) ? 1 : 0,
-    },
-  ];
+  const columns = getUsersColumns(isUserActive);
 
   if (isLoading) {
     return (
@@ -98,89 +84,125 @@ export default function UsersScreen() {
   }
 
   return (
-    <DataTable
-      data={users || []}
-      columns={columns}
-      keyExtractor={(user) => user.userId}
-      renderRow={(user) => (
-        <>
-          <View style={styles.cellWithAvatar}>
-            <Avatar.Image
-              size={32}
-              source={{ uri: `${API_CONFIG.IMAGE_SERVER_URL}/${user.avatar}` }}
-            />
-            <Text variant="bodyMedium" style={{ fontWeight: '600', marginLeft: 12 }}>
-              {user.name} {user.lastname}
-            </Text>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        {/* Título sección */}
+        <Text variant="headlineMedium" style={{ color: theme.colors.secondary }}>
+          Gestión de Usuarios
+        </Text>
 
-          <View style={styles.cell}>
-            <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
-              {user.email}
-            </Text>
-          </View>
+        {/* Botón crear usuario */}
+        <Button
+          icon="plus"
+          mode="contained"
+          onPress={() => router.push('/users/create')}
+          style={{ backgroundColor: theme.colors.success }}
+        >
+          Crear Usuario
+        </Button>
+      </View>
 
-          <View style={styles.cell}>
-            <View style={styles.chipWrapper}>
-              <StyledChip color={getRoleColor(user.roles)}>
-                {getRoleLabel(user.roles)}
-              </StyledChip>
-            </View>
-          </View>
-
-          <View style={styles.cell}>
-            {user.roles.includes('teacher') && user.department ? (
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
-                {user.department.name}
+      <DataTable
+        data={users || []}
+        columns={columns}
+        keyExtractor={(user) => user.userId}
+        renderRow={(user) => (
+          <>
+            {/* Columna de usuario */}
+            <View style={styles.cellWithAvatar}>
+              <Avatar.Image
+                size={32}
+                source={{ uri: `${API_CONFIG.IMAGE_SERVER_URL}/${user.avatar}` }}
+              />
+              <Text variant="bodyMedium" style={{ fontWeight: '600', marginLeft: 12 }}>
+                {user.name} {user.lastname}
               </Text>
-            ) : (
+            </View>
+
+            {/* Columna de email */}
+            <View style={styles.cell}>
               <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                &nbsp;
+                {user.email}
               </Text>
-            )}
-          </View>
-
-          <View style={styles.cellStatus}>
-            <View style={styles.chipWrapper}>
-              <StyledChip color={isUserActive(user) ? theme.colors.success : theme.colors.grey}>
-                {isUserActive(user) ? 'Activo' : 'Inactivo'}
-              </StyledChip>
             </View>
-          </View>
-        </>
-      )}
-      isLoading={isFetching}
-      onRefresh={refetch}
-      emptyMessage="No hay usuarios disponibles"
-      defaultSortKey="name"
-    />
+
+            {/* Columna de roles */}
+            <View style={styles.cellRoles}>
+              <View style={styles.rolesContainer}>
+                {user.roles.map((role, index) => (
+                  <StyledChip key={index} color={getRoleColor(role, theme)}>
+                    {getRoleLabel(role)}
+                  </StyledChip>
+                ))}
+              </View>
+            </View>
+
+            {/* Columna de departamento */}
+            <View style={styles.cellDepartment}>
+              {user.roles.includes(RoleName.TEACHER) && user.department ? (
+                <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
+                  {user.department.name}
+                </Text>
+              ) : (
+                <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
+                  &nbsp;
+                </Text>
+              )}
+            </View>
+
+            {/* Columna de estado */}
+            <View style={styles.cellStatus}>
+              <View style={styles.chipWrapper}>
+                <StyledChip color={isUserActive(user) ? theme.colors.success : theme.colors.grey}>
+                  {isUserActive(user) ? 'Activo' : 'Inactivo'}
+                </StyledChip>
+              </View>
+            </View>
+
+            {/* Columna de acciones */}
+            <View style={styles.cellActions}>
+              <IconButton
+                icon="pencil"
+                size={20}
+                iconColor={theme.colors.secondary}
+                onPress={() => handleEdit(user)}
+                style={{
+                  marginVertical: -1,
+                  marginLeft: -10,
+                }}
+              />
+              <IconButton
+                icon="delete"
+                size={20}
+                iconColor={theme.colors.error}
+                onPress={() => handleDeleteClick(user)}
+                style={{
+                  marginVertical: -1,
+                  marginLeft: -2,
+                }}
+              />
+            </View>
+          </>
+        )}
+        isLoading={isFetching}
+        onRefresh={refetch}
+        emptyMessage="No hay usuarios disponibles"
+        defaultSortKey="name"
+      />
+
+      {/* Dialogo de confirmación para eliminar usuario */}
+      <ConfirmDialog
+        visible={deleteDialogVisible}
+        onDismiss={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar al usuario"
+        highlightedText={userToDelete ? `${userToDelete.name} ${userToDelete.lastname}` : ''}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        isLoading={deleteUser.isPending}
+        variant="danger"
+      />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  cellWithAvatar: {
-    flex: 1.5,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cell: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  cellStatus: {
-    flex: 0.5,
-    justifyContent: 'center',
-  },
-  chipWrapper: {
-    alignSelf: 'flex-start',
-  },
-});

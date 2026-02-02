@@ -164,7 +164,7 @@ const customLightTheme = {
     onSurfaceVariant: 'rgb(0, 0, 0)',         // #000000
     
     // Otros colores
-    outline: 'rgb(167, 243, 208)',            // #A7F3D0
+    outline: 'rgb(156, 197, 255)',            // #9CC5FF
     outlineVariant: 'rgb(211, 211, 211)',     // #D3D3D3 (lightGrey)
     shadow: 'rgb(0, 0, 0)',
     scrim: 'rgb(0, 0, 0)',
