@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Snackbar, Portal } from 'react-native-paper';
 import { useAppTheme } from '../theme';
 
-type SnackbarVariant = 'success' | 'info' | 'error';
+type SnackbarVariant = 'success' | 'info' | 'warning' | 'error';
 
 interface StyledSnackbarProps {
   visible: boolean;
@@ -40,6 +40,11 @@ export function StyledSnackbar({
         return {
           backgroundColor: theme.colors.error,
           textColor: theme.colors.onError,
+        };
+      case 'warning':
+        return {
+          backgroundColor: theme.colors.warning,
+          textColor: theme.colors.onWarning,
         };
       case 'info':
       default:

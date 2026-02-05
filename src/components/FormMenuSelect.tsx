@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Menu, TextInput, HelperText } from 'react-native-paper';
 import { Controller, Control, FieldErrors, FieldValues, Path } from 'react-hook-form';
 import { useAppTheme } from '../theme';
@@ -54,7 +54,8 @@ export function FormMenuSelect<T extends FieldValues>({
               contentStyle={[styles.menuContent, { backgroundColor: theme.colors.onTertiary }]}
               style={styles.menuContainer}
               anchor={
-                <TextInput
+                <Pressable onPress={() => !disabled && setMenuVisible(true)} disabled={disabled}>
+                  <TextInput
                   label={label}
                   value={selectedOption?.label || ''}
                   mode="outlined"
@@ -71,13 +72,14 @@ export function FormMenuSelect<T extends FieldValues>({
                   right={
                     <TextInput.Icon
                       icon={menuVisible ? 'menu-up' : 'menu-down'}
-                      onPress={() => !disabled && setMenuVisible(true)}
-                      rippleColor={addOpacity(theme.colors.secondary, 0.2)}
                       style={styles.menuIcon}
+                      forceTextInputFocus={false}
+                      disabled
                     />
                   }
-                  onPress={() => !disabled && setMenuVisible(true)}
-                />
+                  pointerEvents="none"
+                  />
+                </Pressable>
               }
             >
               <ScrollView style={styles.menuScroll}>
@@ -94,7 +96,7 @@ export function FormMenuSelect<T extends FieldValues>({
                       title={option.label}
                       style={
                         value === option.value
-                          ? [styles.selectedMenuItem, { backgroundColor: theme.colors.surfaceVariant }]
+                          ? [styles.selectedMenuItem, { backgroundColor: addOpacity(theme.colors.surfaceVariant, 0.7) }]
                           : styles.menuItem
                       }
                       titleStyle={theme.fonts.bodyMedium}
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   inputOutlineFocused: {
-    borderWidth: 2,
+    borderWidth: 1.5,
   },
   menuIcon: {
     width: 32,
@@ -134,11 +136,15 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     marginTop: 10,
+    width: '100%',
   },
   menuContent: {
     borderRadius: 20,
-    maxHeight: 286,
-    minWidth: 200,
+    alignSelf: 'flex-end',
+    paddingVertical: 15,
+    marginLeft: 'auto',
+    maxHeight: 268,
+    minWidth: 225,
   },
   menuScroll: {
     maxHeight: 286,

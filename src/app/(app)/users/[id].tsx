@@ -6,7 +6,7 @@ import { useAppTheme } from '../../../theme';
 import { UserForm } from '../../../components/UserForm';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
 import { useUser, useUpdateUser } from '../../../hooks/queries/useUsers';
-import { UserFormData } from '../../../schemas/user.schema';
+import { UserEditFormData } from '../../../schemas/user.schema';
 
 export default function EditUserScreen() {
   const theme = useAppTheme();
@@ -17,7 +17,7 @@ export default function EditUserScreen() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  const handleSubmit = async (data: UserFormData) => {
+  const handleSubmit = async (data: UserEditFormData) => {
     if (!id) return;
 
     try {
