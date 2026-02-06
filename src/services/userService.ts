@@ -2,13 +2,30 @@
  * Service para operaciones de usuarios
  */
 
-import { User, UpdateUserData, DeleteUserResponse, CreateUserData } from '../types/User';
+import { User, UpdateUserData, DeleteUserResponse, CreateUserData, PaginatedUsers, UsersFilters } from '../types/User';
 import apiService from './apiService';
 
 export const userService = {
-  // Obtiene todos los usuarios
-  async getAllUsers(): Promise<User[]> {
-    return apiService.get<User[]>('/users');
+  // Obtiene todos los usuarios con filtros opcionales
+  async getAllUsers(filters?: UsersFilters): Promise<PaginatedUsers> {
+    const params = new URLSearchParams();
+    
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.fullName) params.append('fullName', filters.fullName);
+    if (filters?.email) params.append('email', filters.email);
+    if (filters?.roles) {
+      const rolesArray = Array.isArray(filters.roles) ? filters.roles : [filters.roles];
+      rolesArray.forEach(role => params.append('roles', role));
+    }
+    if (filters?.departmentId) params.append('departmentId', filters.departmentId.toString());
+    if (filters?.state) params.append('state', filters.state);
+    if (filters?.search) params.append('search', filters.search);
+    
+    const queryString = params.toString();
+    const url = queryString ? `/users?${queryString}` : '/users';
+    
+    return apiService.get<PaginatedUsers>(url);
   },
 
   // Obtiene un usuario por su ID

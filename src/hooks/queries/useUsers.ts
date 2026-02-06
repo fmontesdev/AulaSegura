@@ -4,7 +4,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../../services/userService';
-import { User, UpdateUserData, CreateUserData } from '../../types/User';
+import { UpdateUserData, CreateUserData, UsersFilters } from '../../types/User';
 
 // Keys para el caché de React Query
 export const userKeys = {
@@ -15,11 +15,11 @@ export const userKeys = {
   detail: (userId: string) => [...userKeys.details(), userId] as const,
 };
 
-// Hook para obtener todos los usuarios
-export function useUsers() {
+// Hook para obtener todos los usuarios con filtros opcionales
+export function useUsers(filters?: UsersFilters) {
   return useQuery({
-    queryKey: userKeys.lists(),
-    queryFn: () => userService.getAllUsers(),
+    queryKey: userKeys.list(filters),
+    queryFn: () => userService.getAllUsers(filters),
     staleTime: 1000 * 60 * 2, // 2 minutos
   });
 }
@@ -41,14 +41,8 @@ export function useCreateUser() {
 
   return useMutation({
     mutationFn: (data: CreateUserData) => userService.createUser(data),
-    onSuccess: (newUser) => {
-      // Añade el nuevo usuario al caché de la lista
-      queryClient.setQueryData<User[]>(userKeys.lists(), (oldUsers) => {
-        if (!oldUsers) return [newUser];
-        return [...oldUsers, newUser];
-      });
-
-      // Invalida queries relacionadas para forzar refetch si es necesario
+    onSuccess: () => {
+      // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
   });
@@ -63,18 +57,10 @@ export function useUpdateUser() {
     mutationFn: ({ userId, data }: { userId: string; data: UpdateUserData }) =>
       userService.updateUser(userId, data),
     onSuccess: (updatedUser) => {
-      // Actualiza el usuario en el caché de la lista
-      queryClient.setQueryData<User[]>(userKeys.lists(), (oldUsers) => {
-        if (!oldUsers) return oldUsers;
-        return oldUsers.map((user) =>
-          user.userId === updatedUser.userId ? updatedUser : user
-        );
-      });
-
       // Actualiza el usuario en el caché de detalle
       queryClient.setQueryData(userKeys.detail(updatedUser.userId), updatedUser);
 
-      // Invalida queries relacionadas para forzar refetch si es necesario
+      // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
   });
@@ -88,16 +74,10 @@ export function useDeleteUser() {
   return useMutation({
     mutationFn: (userId: string) => userService.deleteUser(userId),
     onSuccess: (_, deletedUserId) => {
-      // Elimina el usuario del caché de la lista
-      queryClient.setQueryData<User[]>(userKeys.lists(), (oldUsers) => {
-        if (!oldUsers) return oldUsers;
-        return oldUsers.filter((user) => user.userId !== deletedUserId);
-      });
-
       // Elimina el usuario del caché de detalle
       queryClient.removeQueries({ queryKey: userKeys.detail(deletedUserId) });
 
-      // Invalida la lista para asegurar sincronización
+      // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
   });
@@ -112,19 +92,10 @@ export function useUploadAvatar() {
     mutationFn: ({ userId, file }: { userId: string; file: File }) =>
       userService.uploadAvatar(userId, file),
     onSuccess: (updatedUser) => {
-      // Actualiza el usuario en el caché de la lista
-      queryClient.setQueryData<User[]>(userKeys.lists(), (oldUsers) => {
-        if (!oldUsers) return oldUsers;
-        return oldUsers.map((user) =>
-          user.userId === updatedUser.userId ? updatedUser : user
-        );
-      });
-
       // Actualiza el usuario en el caché de detalle
       queryClient.setQueryData(userKeys.detail(updatedUser.userId), updatedUser);
 
-      // Invalida queries relacionadas para forzar refetch si es necesario
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(updatedUser.userId) });
+      // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
   });
