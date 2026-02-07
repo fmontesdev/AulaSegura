@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { Appbar, ActivityIndicator, Text } from 'react-native-paper';
+import { Appbar, ActivityIndicator, Text, IconButton } from 'react-native-paper';
 import { useAppTheme } from '../../../theme';
 import { UserForm } from '../../../components/UserForm';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
@@ -87,23 +87,38 @@ export default function EditUserScreen() {
         }}
       />
       <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <IconButton
+              icon="arrow-left"
+              size={22}
+              onPress={() => router.back()}
+              iconColor={theme.colors.secondary}
+            />
+            <Text variant="headlineMedium" style={{ color: theme.colors.secondary }}>
+              Editar Usuario
+            </Text>
+          </View>
+        </View>
+
         <UserForm
           mode="edit"
           initialData={user}
           onSubmit={handleSubmit}
           isLoading={updateUser.isPending}
         />
+
+        <StyledSnackbar
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          message={snackbarMessage}
+          variant="error"
+          action={{
+            label: 'Cerrar',
+            onPress: () => setSnackbarVisible(false),
+          }}
+        />
       </View>
-      <StyledSnackbar
-        visible={snackbarVisible}
-        onDismiss={() => setSnackbarVisible(false)}
-        message={snackbarMessage}
-        variant="error"
-        action={{
-          label: 'Cerrar',
-          onPress: () => setSnackbarVisible(false),
-        }}
-      />
     </>
   );
 }
@@ -115,5 +130,18 @@ const styles = StyleSheet.create({
   centered: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: -4,
+    marginLeft: -6,
+    paddingBottom: 8,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
 });
