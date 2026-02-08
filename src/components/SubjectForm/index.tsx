@@ -1,7 +1,3 @@
-/**
- * Componente de formulario para crear/editar asignaturas
- */
-
 import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { Button } from 'react-native-paper';
@@ -13,7 +9,7 @@ import { FormMultiSelect } from '../FormMultiSelect';
 import { useAppTheme } from '../../theme';
 import { SubjectFormSchema, SubjectFormData } from '../../schemas/subject.schema';
 import { Subject } from '../../types/Subject';
-import { Department } from '../../types/Department';
+import { DepartmentBasic } from '../../types/Department';
 import { Course } from '../../types/Course';
 import { useDepartments } from '../../hooks/queries/useDepartments';
 import { useCourses } from '../../hooks/queries/useCourses';
@@ -113,7 +109,7 @@ export function SubjectForm({ mode, initialData, onSubmit, isLoading = false }: 
             name="departmentId"
             label="Departamento"
             errors={errors}
-            options={departments.map((dept: Department) => ({
+            options={departments.map((dept: DepartmentBasic) => ({
               label: dept.name,
               value: dept.departmentId,
             }))}

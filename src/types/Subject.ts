@@ -2,7 +2,7 @@
  * Tipos para la entidad Subject (Asignaturas)
  */
 
-import { Department } from './Department';
+import { DepartmentBasic } from './Department';
 import { Course } from './Course';
 import { Pagination } from './Pagination';
 
@@ -11,7 +11,7 @@ export interface Subject {
   subjectCode: string;
   name: string;
   isActive: boolean;
-  department: Department;
+  department: DepartmentBasic;
   courses: Course[];
 }
 

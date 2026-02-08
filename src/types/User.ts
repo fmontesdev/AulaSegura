@@ -2,7 +2,7 @@
  * Tipos para la entidad User (Usuario)
  */
 
-import { Department } from './Department';
+import { DepartmentBasic } from './Department';
 import { Pagination } from './Pagination';
 
 // Enum de roles disponibles
@@ -24,7 +24,7 @@ export interface User {
   validFrom?: string;
   validTo?: string | null;
   createdAt?: string;
-  department?: Department;
+  department?: DepartmentBasic;
 }
 
 // Respuesta paginada de usuarios

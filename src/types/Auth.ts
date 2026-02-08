@@ -1,5 +1,5 @@
 import { User } from './User';
-import { Department } from './Department';
+import { DepartmentBasic } from './Department';
 
 // Contexto de autenticación
 export interface AuthContextType {
@@ -21,7 +21,7 @@ export interface AuthResponse {
   email: string;
   avatar: string;
   roles: string[];
-  department?: Department;
+  department?: DepartmentBasic;
 }
 
 // Request de login
