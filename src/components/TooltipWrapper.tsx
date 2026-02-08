@@ -25,11 +25,11 @@ export const TooltipWrapper: React.FC<TooltipWrapperProps> = ({ title, children,
         {children}
         <Text variant="labelSmall" style={[
           styles.tooltip,
-          {backgroundColor: addOpacity(theme.colors.quinary, 0.95)},
+          {backgroundColor: addOpacity(theme.colors.quinary, 0.94)},
           {color: theme.colors.secondary},
           {opacity: isHovered ? 1 : 0},
           {transform: 'translateX(-60%) translateY(-8px)'},
-          {boxShadow: '0 2px 3px rgba(0,0,0,0.25)'},
+          {boxShadow: '0 2px 2px rgba(0,0,0,0.20)'},
         ]}>
           {title}
         </Text>

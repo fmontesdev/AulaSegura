@@ -47,6 +47,7 @@ export function MultiSelectItem({
         value={isSelected}
         onValueChange={() => onToggle(option.value)}
         color={theme.colors.tertiary}
+        style={styles.switch}
       />
     </Pressable>
   );

@@ -23,11 +23,11 @@ export const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     paddingVertical: 15,
     marginLeft: 'auto',
-    maxHeight: 268,
+    maxHeight: 331,
     minWidth: 225,
   },
   menuScroll: {
-    maxHeight: 286,
+    maxHeight: 320,
   },
   switchItem: {
     flexDirection: 'row',
@@ -35,10 +35,15 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    minHeight: 45,
+    minHeight: 43,
   },
   switchLabel: {
     flex: 1,
+    marginLeft: 3,
     marginRight: 12,
+  },
+  switch: {
+    transform: [{ scale: 0.9 }],
+    marginLeft: 3,
   },
 });
