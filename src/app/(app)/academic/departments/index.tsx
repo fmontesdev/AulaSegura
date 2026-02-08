@@ -198,9 +198,14 @@ export default function DepartmentsScreen() {
                   return (
                     <>
                       {displaySubjects.map(subject => (
-                        <StyledChip key={subject.subjectId} color={theme.colors.warning}>
-                          {subject.subjectCode}
-                        </StyledChip>
+                        <TooltipWrapper key={subject.subjectId} title={subject.name}>
+                          <StyledChip 
+                            color={theme.colors.warning}
+                            onPress={() => router.push(`/academic/subjects/${subject.subjectId}`)}
+                          >
+                            {subject.subjectCode}
+                          </StyledChip>
+                        </TooltipWrapper>
                       ))}
                       {hasMore && (
                         <ExpandButton
@@ -236,7 +241,11 @@ export default function DepartmentsScreen() {
                   return (
                     <>
                       {displayTeachers.map(teacher => (
-                        <StyledChip key={teacher.userId} color={theme.colors.secondary}>
+                        <StyledChip 
+                          key={teacher.userId} 
+                          color={theme.colors.secondary}
+                          onPress={() => router.push(`/users/${teacher.userId}`)}
+                        >
                           {`${teacher.name} ${teacher.lastname}`}
                         </StyledChip>
                       ))}
@@ -283,11 +292,11 @@ export default function DepartmentsScreen() {
                 <TooltipWrapper title="Desactivar">
                   <IconButton
                     icon="toggle-switch-off"
-                    size={24}
+                    size={20}
                     iconColor={theme.colors.error}
                     onPress={() => handleDeactivateClick(department)}
                     style={{
-                      marginVertical: -3,
+                      marginVertical: -1,
                       marginLeft: -2,
                       borderWidth: 1,
                       borderColor: addOpacity(theme.colors.error, 0.3),
@@ -299,11 +308,11 @@ export default function DepartmentsScreen() {
                 <TooltipWrapper title="Activar">
                   <IconButton
                     icon="toggle-switch"
-                    size={24}
+                    size={20}
                     iconColor={theme.colors.success}
                     onPress={() => handleActivateClick(department)}
                     style={{
-                      marginVertical: -3,
+                      marginVertical: -1,
                       marginLeft: -2,
                       borderWidth: 1,
                       borderColor: addOpacity(theme.colors.success, 0.3),

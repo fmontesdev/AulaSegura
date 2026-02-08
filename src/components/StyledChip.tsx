@@ -4,16 +4,14 @@ import { Chip } from 'react-native-paper';
 import { useAppTheme } from '../theme';
 import { addOpacity } from '../utils/colorUtils';
 
-type ChipVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
-
 interface StyledChipProps {
   text?: string;
   children?: string;
   color?: string;
-  variant?: ChipVariant;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   onClose?: () => void;
+  onPress?: () => void;
 }
 
 // Chip con borderRadius, texto con estilos, y backgroundColor con opacidad
@@ -21,32 +19,15 @@ export function StyledChip({
   text, 
   children, 
   color, 
-  variant = 'default',
   style, 
   textStyle,
   onClose,
+  onPress,
 }: StyledChipProps) {
   const theme = useAppTheme();
-  
-  // Determinar el color según la variante
-  const getVariantColor = () => {
-    if (color) return color;
-    
-    switch (variant) {
-      case 'success':
-        return theme.colors.success;
-      case 'error':
-        return theme.colors.error;
-      case 'warning':
-        return theme.colors.warning;
-      case 'info':
-        return theme.colors.tertiary;
-      default:
-        return theme.colors.grey;
-    }
-  };
 
-  const chipColor = getVariantColor();
+
+  const chipColor = color || theme.colors.primary;
   const displayText = text || children || '';
 
   return (
@@ -55,6 +36,8 @@ export function StyledChip({
       compact
       onClose={onClose}
       closeIcon="close"
+      onPress={onPress}
+      rippleColor={addOpacity(chipColor, 0.16)}
       style={[
         styles.chip,
         { backgroundColor: addOpacity(chipColor, 0.12) },

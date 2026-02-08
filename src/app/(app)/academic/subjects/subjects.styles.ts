@@ -58,6 +58,6 @@ export const styles = StyleSheet.create({
   coursesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
+    gap: 6,
   },
 });

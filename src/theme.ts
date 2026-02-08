@@ -270,6 +270,7 @@ export const appLightTheme = {
     darkGrey: 'rgb(64, 64, 64)',           // #404040
     grey: 'rgb(128, 128, 128)',            // #808080
     lightGrey: 'rgb(211, 211, 211)',       // #D3D3D3
+    superlightGrey: 'rgb(237, 237, 237)',  // #E8E8E8
     highlight: 'rgb(24, 45, 115)',         // #182D73
     titles: 'rgb(127, 172, 245)',          // #7FACF5
     card: 'rgb(255, 255, 255)',            // #FFFFFF
@@ -292,6 +293,7 @@ export const appDarkTheme = {
     darkGrey: 'rgb(64, 64, 64)',           // #404040
     grey: 'rgb(128, 128, 128)',            // #808080
     lightGrey: 'rgb(211, 211, 211)',       // #D3D3D3
+    superlightGrey: 'rgb(237, 237, 237)',  // #E8E8E8
     highlight: 'rgb(255, 255, 255)',       // #FFFFFF
     titles: 'rgb(83, 83, 83)',             // #535353
     card: 'rgb(30, 30, 30)',               // #1E1E1E

@@ -171,9 +171,20 @@ export default function UsersScreen() {
 
             {/* Columna de departamento */}
             <View style={styles.cellDepartment}>
-              <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                {user.department?.name ?? '-'}
-              </Text>
+              {user.department ? (
+                <View style={styles.chipWrapper}>
+                  <StyledChip 
+                    color={theme.colors.grey}
+                    onPress={() => router.push(`/academic/departments/${user.department!.departmentId}`)}
+                  >
+                    {user.department.name}
+                  </StyledChip>
+                </View>
+              ) : (
+                <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
+                  -
+                </Text>
+              )}
             </View>
 
             {/* Columna de estado */}

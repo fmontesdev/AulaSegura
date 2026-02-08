@@ -186,9 +186,14 @@ export default function SubjectsScreen() {
 
             {/* Columna de departamento */}
             <View style={styles.cellDepartment}>
-              <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                {subject.department.name}
-              </Text>
+              <View style={styles.chipWrapper}>
+                <StyledChip 
+                  color={theme.colors.grey}
+                  onPress={() => router.push(`/academic/departments/${subject.department.departmentId}`)}
+                >
+                  {subject.department.name}
+                </StyledChip>
+              </View>
             </View>
 
             {/* Columna de cursos */}
@@ -202,9 +207,14 @@ export default function SubjectsScreen() {
                   return (
                     <>
                       {displayCourses.map(course => (
-                        <StyledChip key={course.courseId} color={theme.colors.warning}>
-                          {course.courseCode}
-                        </StyledChip>
+                        <TooltipWrapper key={course.courseId} title={course.name}>
+                          <StyledChip 
+                            color={theme.colors.warning}
+                            onPress={() => router.push(`/academic/courses/${course.courseId}`)}
+                          >
+                            {course.courseCode}
+                          </StyledChip>
+                        </TooltipWrapper>
                       ))}
                       {hasMore && (
                         <ExpandButton
