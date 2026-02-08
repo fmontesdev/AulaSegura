@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormTextInput } from '../FormTextInput';
 import { FormSegmentedButtons } from '../FormSegmentedButtons';
-import { FormMenuSelect } from '../FormMenuSelect';
+import { FormSingleSelect } from '../FormSingleSelect';
 import { FormCheckbox } from '../FormCheckbox';
 import { FormDatePicker } from '../FormDatePicker';
 import { AvatarPicker, AvatarPickerRef } from '../AvatarPicker';
@@ -226,7 +226,7 @@ export function UserForm({ mode, initialData, onSubmit, isLoading = false }: Use
           {/* Select de Departamentos (solo para profesores) */}
           {selectedRoles.includes(RoleName.TEACHER) && (
             <View style={styles.departmentSection}>
-              <FormMenuSelect
+              <FormSingleSelect
                 control={control}
                 name="departmentId"
                 label="Departamento"

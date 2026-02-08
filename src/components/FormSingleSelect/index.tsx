@@ -1,28 +1,26 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, ScrollView, Pressable } from 'react-native';
 import { Menu, TextInput, HelperText } from 'react-native-paper';
 import { Controller, Control, FieldErrors, FieldValues, Path } from 'react-hook-form';
-import { useAppTheme } from '../theme';
-import { addOpacity } from '../utils/colorUtils';
+import { useAppTheme } from '../../theme';
+import { SingleSelectOption, SingleSelectItem } from './components/SingleSelectItem';
+import { styles } from './FormSingleSelect.styles';
 
-export interface MenuSelectOption {
-  value: string | number;
-  label: string;
-}
+export type { SingleSelectOption };
 
-interface FormMenuSelectProps<T extends FieldValues> {
+interface FormSingleSelectProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
   errors: FieldErrors<T>;
-  options: MenuSelectOption[];
+  options: SingleSelectOption[];
   isLoading?: boolean;
   loadingText?: string;
   emptyText?: string;
   disabled?: boolean;
 }
 
-export function FormMenuSelect<T extends FieldValues>({
+export function FormSingleSelect<T extends FieldValues>({
   control,
   name,
   label,
@@ -32,10 +30,15 @@ export function FormMenuSelect<T extends FieldValues>({
   loadingText = 'Cargando...',
   emptyText = 'No hay opciones disponibles',
   disabled = false,
-}: FormMenuSelectProps<T>) {
+}: FormSingleSelectProps<T>) {
   const theme = useAppTheme();
   const [menuVisible, setMenuVisible] = useState(false);
   const error = errors[name];
+
+  const handleSelect = (onChange: (value: any) => void, value: string | number) => {
+    onChange(value);
+    setMenuVisible(false);
+  };
 
   return (
     <Controller
@@ -87,20 +90,12 @@ export function FormMenuSelect<T extends FieldValues>({
                   <Menu.Item title={loadingText} disabled />
                 ) : options.length > 0 ? (
                   options.map((option) => (
-                    <Menu.Item
+                    <SingleSelectItem
                       key={String(option.value)}
-                      onPress={() => {
-                        onChange(option.value);
-                        setMenuVisible(false);
-                      }}
-                      title={option.label}
-                      style={
-                        value === option.value
-                          ? [styles.selectedMenuItem, { backgroundColor: addOpacity(theme.colors.surfaceVariant, 0.7) }]
-                          : styles.menuItem
-                      }
-                      titleStyle={theme.fonts.bodyMedium}
-                      rippleColor={addOpacity(theme.colors.secondary, 0.2)}
+                      option={option}
+                      isSelected={value === option.value}
+                      onSelect={(selectedValue) => handleSelect(onChange, selectedValue)}
+                      theme={theme}
                     />
                   ))
                 ) : (
@@ -119,42 +114,3 @@ export function FormMenuSelect<T extends FieldValues>({
     />
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    fontSize: 14,
-  },
-  inputOutline: {
-    borderRadius: 20,
-  },
-  inputOutlineFocused: {
-    borderWidth: 1.5,
-  },
-  menuIcon: {
-    width: 32,
-    height: 32,
-  },
-  menuContainer: {
-    marginTop: 10,
-    width: '100%',
-  },
-  menuContent: {
-    borderRadius: 20,
-    alignSelf: 'flex-end',
-    paddingVertical: 15,
-    marginLeft: 'auto',
-    maxHeight: 268,
-    minWidth: 225,
-  },
-  menuScroll: {
-    maxHeight: 286,
-  },
-  menuItem: {
-    height: 34,
-    minHeight: 34,
-  },
-  selectedMenuItem: {
-    height: 34,
-    minHeight: 34,
-  },
-});
