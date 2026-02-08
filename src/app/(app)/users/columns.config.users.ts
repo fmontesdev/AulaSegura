@@ -37,7 +37,7 @@ export const getUsersColumns = (isUserActive: (user: User) => boolean): ColumnCo
   {
     key: 'actions',
     label: 'Acciones',
-    flex: 0.4,
+    flex: 0.35,
     sortable: false,
   },
 ];

@@ -37,8 +37,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cellActions: {
-    flex: 0.4,
+    flex: 0.35,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   chipWrapper: {
     alignSelf: 'flex-start',

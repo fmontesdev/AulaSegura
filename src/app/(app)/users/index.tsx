@@ -12,6 +12,7 @@ import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { TooltipWrapper } from '../../../components/TooltipWrapper';
 import { User } from '../../../types/User';
 import { getRoleLabel, getRoleColor } from '../../../utils/roleUtils';
+import { addOpacity } from '../../../utils/colorUtils';
 import { getUsersColumns } from './columns.config.users';
 import { styles } from './users.styles';
 
@@ -193,8 +194,11 @@ export default function UsersScreen() {
                   iconColor={theme.colors.secondary}
                   onPress={() => handleEdit(user)}
                   style={{
-                    marginVertical: -1,
+                    marginVertical: -2,
                     marginLeft: -10,
+                    borderWidth: 1,
+                    borderColor: addOpacity(theme.colors.secondary, 0.3),
+                    borderRadius: 20,
                   }}
                 />
               </TooltipWrapper>
@@ -205,8 +209,11 @@ export default function UsersScreen() {
                   iconColor={theme.colors.error}
                   onPress={() => handleDeleteClick(user)}
                   style={{
-                    marginVertical: -1,
+                    marginVertical: -2,
                     marginLeft: -2,
+                    borderWidth: 1,
+                    borderColor: addOpacity(theme.colors.error, 0.3),
+                    borderRadius: 20,
                   }}
                 />
               </TooltipWrapper>

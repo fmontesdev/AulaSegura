@@ -49,6 +49,7 @@ export const styles = StyleSheet.create({
   cellActions: {
     flex: 0.25,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   chipWrapper: {
     alignSelf: 'flex-start',

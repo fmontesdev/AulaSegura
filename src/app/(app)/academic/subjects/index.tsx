@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Pressable } from 'react-native';
-import { Text, ActivityIndicator, IconButton, Button, Icon } from 'react-native-paper';
+import { View } from 'react-native';
+import { Text, ActivityIndicator, IconButton, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../../../theme';
 import { useFilters } from '../../../../contexts/FilterContext';
 import { useSubjects, useUpdateSubject } from '../../../../hooks/queries/useSubjects';
+import { useExpandable } from '../../../../hooks/useExpandable';
 import { StyledChip } from '../../../../components/StyledChip';
 import { DataTable } from '../../../../components/DataTable';
 import { ConfirmDialog } from '../../../../components/ConfirmDialog';
 import { TooltipWrapper } from '../../../../components/TooltipWrapper';
+import { ExpandButton } from '../../../../components/ExpandButton';
 import { Subject } from '../../../../types/Subject';
 import { getSubjectsColumns } from './columns.config.subjects';
 import { addOpacity } from '../../../../utils/colorUtils';
@@ -24,8 +26,7 @@ export default function SubjectsScreen() {
   const [subjectToToggle, setSubjectToToggle] = useState<Subject | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentLimit, setCurrentLimit] = useState(10);
-  const [expandedSubjects, setExpandedSubjects] = useState<Set<string>>(new Set());
-  const [hoveredExpandButton, setHoveredExpandButton] = useState<string | null>(null);
+  const { toggle: toggleExpandCourses, isExpanded: isCourseExpanded, reset: resetExpandedCourses } = useExpandable();
 
   // Resetear a página 1 cuando cambien los filtros
   useEffect(() => {
@@ -34,9 +35,8 @@ export default function SubjectsScreen() {
 
   // Limpiar expansiones cuando cambie la página
   useEffect(() => {
-    setExpandedSubjects(new Set());
-    setHoveredExpandButton(null);
-  }, [currentPage]);
+    resetExpandedCourses();
+  }, [currentPage, resetExpandedCourses]);
 
   // Hook de TanStack Query para obtener todas las asignaturas
   const { data: subjectsResponse, isLoading, error, isFetching, refetch } = useSubjects({
@@ -113,18 +113,7 @@ export default function SubjectsScreen() {
     setSubjectToToggle(null);
   };
 
-  // Función para expandir/colapsar la lista de cursos en una asignatura
-  const toggleExpandCourses = (subjectId: string) => {
-    setExpandedSubjects(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(subjectId)) {
-        newSet.delete(subjectId);
-      } else {
-        newSet.add(subjectId);
-      }
-      return newSet;
-    });
-  };
+
 
   const columns = getSubjectsColumns();
 
@@ -206,7 +195,7 @@ export default function SubjectsScreen() {
             <View style={styles.cellCourses}>
               <View style={styles.coursesContainer}>
                 {(() => {
-                  const isExpanded = expandedSubjects.has(String(subject.subjectId));
+                  const isExpanded = isCourseExpanded(String(subject.subjectId));
                   const displayCourses = isExpanded ? subject.courses : subject.courses.slice(0, 2);
                   const hasMore = subject.courses.length > 2;
 
@@ -218,37 +207,11 @@ export default function SubjectsScreen() {
                         </StyledChip>
                       ))}
                       {hasMore && (
-                        <Pressable
-                          onPress={() => toggleExpandCourses(String(subject.subjectId))}
-                          onHoverIn={() => setHoveredExpandButton(String(subject.subjectId))}
-                          onHoverOut={() => setHoveredExpandButton(null)}
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            paddingVertical: 2,
-                            paddingLeft: 9,
-                            paddingRight: 4,
-                            borderRadius: 15,
-                            backgroundColor: hoveredExpandButton === String(subject.subjectId) 
-                              ? addOpacity(theme.colors.secondary, 0.05)
-                              : 'transparent',
-                          }}
-                        >
-                          <Text 
-                            variant="bodySmall" 
-                            style={[{ fontWeight: '600' }, { color: theme.colors.tertiary }]}
-                          >
-                            {isExpanded 
-                              ? 'Ocultar' 
-                              : `${subject.courses.length - 2} más`
-                            }
-                          </Text>
-                          <Icon
-                            source={isExpanded ? 'chevron-up' : 'chevron-down'}
-                            size={20}
-                            color={theme.colors.tertiary}
-                          />
-                        </Pressable>
+                        <ExpandButton
+                          isExpanded={isExpanded}
+                          onToggle={() => toggleExpandCourses(String(subject.subjectId))}
+                          remainingCount={subject.courses.length - 2}
+                        />
                       )}
                     </>
                   );
@@ -274,8 +237,11 @@ export default function SubjectsScreen() {
                   iconColor={theme.colors.secondary}
                   onPress={() => handleEdit(subject)}
                   style={{
-                    marginVertical: -1,
+                    marginVertical: -2,
                     marginLeft: -10,
+                    borderWidth: 1,
+                    borderColor: addOpacity(theme.colors.secondary, 0.3),
+                    borderRadius: 20,
                   }}
                 />
               </TooltipWrapper>
@@ -283,12 +249,15 @@ export default function SubjectsScreen() {
                 <TooltipWrapper title="Desactivar">
                   <IconButton
                     icon="toggle-switch-off"
-                    size={24}
+                    size={20}
                     iconColor={theme.colors.error}
                     onPress={() => handleDeactivateClick(subject)}
                     style={{
-                      marginVertical: -3,
+                      marginVertical: -2,
                       marginLeft: -2,
+                      borderWidth: 1,
+                      borderColor: addOpacity(theme.colors.error, 0.3),
+                      borderRadius: 20,
                     }}
                   />
                 </TooltipWrapper>
@@ -296,12 +265,15 @@ export default function SubjectsScreen() {
                 <TooltipWrapper title="Activar">
                   <IconButton
                     icon="toggle-switch"
-                    size={24}
+                    size={20}
                     iconColor={theme.colors.success}
                     onPress={() => handleActivateClick(subject)}
                     style={{
-                      marginVertical: -3,
+                      marginVertical: -2,
                       marginLeft: -2,
+                      borderWidth: 1,
+                      borderColor: addOpacity(theme.colors.success, 0.3),
+                      borderRadius: 20,
                     }}
                   />
                 </TooltipWrapper>
