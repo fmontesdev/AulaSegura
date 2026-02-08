@@ -30,15 +30,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cellStage: {
-    flex: 0.7,
+    flex: 0.9,
     justifyContent: 'center',
+    alignItems: 'flex-start',
   },
   cellLevel: {
     flex: 0.5,
     justifyContent: 'center',
   },
   cellCFLevel: {
-    flex: 0.7,
+    flex: 0.6,
     justifyContent: 'center',
   },
   cellStatus: {
@@ -46,8 +47,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cellActions: {
-    flex: 0.4,
+    flex: 0.35,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   chipWrapper: {
     alignSelf: 'flex-start',

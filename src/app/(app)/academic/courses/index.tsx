@@ -11,6 +11,8 @@ import { ConfirmDialog } from '../../../../components/ConfirmDialog';
 import { TooltipWrapper } from '../../../../components/TooltipWrapper';
 import { Course } from '../../../../types/Course';
 import { getCoursesColumns } from './columns.config.courses';
+import { addOpacity } from '../../../../utils/colorUtils';
+import { getEducationStageColor, getEducationStageLabel } from '../../../../utils/educationStageUtils';
 import { styles } from './courses.styles';
 
 // Pantalla de gestión de cursos
@@ -175,15 +177,15 @@ export default function CoursesScreen() {
 
             {/* Columna de etapa educativa */}
             <View style={styles.cellStage}>
-              <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                {course.educationStage}
-              </Text>
+              <StyledChip color={getEducationStageColor(course.educationStage, theme.colors)}>
+                {getEducationStageLabel(course.educationStage)}
+              </StyledChip>
             </View>
 
             {/* Columna de nivel */}
             <View style={styles.cellLevel}>
               <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                {course.levelNumber}º
+                {course.levelNumber}
               </Text>
             </View>
 
@@ -212,8 +214,11 @@ export default function CoursesScreen() {
                   iconColor={theme.colors.secondary}
                   onPress={() => handleEdit(course)}
                   style={{
-                    marginVertical: -1,
+                    marginVertical: -2,
                     marginLeft: -10,
+                    borderWidth: 1,
+                    borderColor: addOpacity(theme.colors.secondary, 0.3),
+                    borderRadius: 20,
                   }}
                 />
               </TooltipWrapper>
@@ -221,12 +226,15 @@ export default function CoursesScreen() {
                 <TooltipWrapper title="Desactivar">
                   <IconButton
                     icon="toggle-switch-off"
-                    size={24}
+                    size={20}
                     iconColor={theme.colors.error}
                     onPress={() => handleDeactivateClick(course)}
                     style={{
-                      marginVertical: -3,
+                      marginVertical: -2,
                       marginLeft: -2,
+                      borderWidth: 1,
+                      borderColor: addOpacity(theme.colors.error, 0.3),
+                      borderRadius: 20,
                     }}
                   />
                 </TooltipWrapper>
@@ -234,12 +242,15 @@ export default function CoursesScreen() {
                 <TooltipWrapper title="Activar">
                   <IconButton
                     icon="toggle-switch"
-                    size={24}
+                    size={20}
                     iconColor={theme.colors.success}
                     onPress={() => handleActivateClick(course)}
                     style={{
-                      marginVertical: -3,
+                      marginVertical: -2,
                       marginLeft: -2,
+                      borderWidth: 1,
+                      borderColor: addOpacity(theme.colors.success, 0.3),
+                      borderRadius: 20,
                     }}
                   />
                 </TooltipWrapper>

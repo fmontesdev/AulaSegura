@@ -21,7 +21,7 @@ export const getCoursesColumns = (): ColumnConfig<Course>[] => [
   {
     key: 'educationStage',
     label: 'Etapa',
-    flex: 0.7,
+    flex: 0.9,
     sortKey: 'educationStage',
   },
   {
@@ -33,7 +33,7 @@ export const getCoursesColumns = (): ColumnConfig<Course>[] => [
   {
     key: 'cfLevel',
     label: 'Nivel CF',
-    flex: 0.7,
+    flex: 0.6,
     sortKey: (course) => course.cfLevel || '',
   },
   {
@@ -45,7 +45,7 @@ export const getCoursesColumns = (): ColumnConfig<Course>[] => [
   {
     key: 'actions',
     label: 'Acciones',
-    flex: 0.4,
+    flex: 0.35,
     sortable: false,
   },
 ];
