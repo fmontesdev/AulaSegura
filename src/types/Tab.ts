@@ -8,10 +8,11 @@ export interface TabConfig {
   name: string;
   title: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  route: string;
   badge?: number;
 }
 
 export interface TabProps {
-  initialRouteName: string;
+  initialRouteName?: string;
   tabs: TabConfig[];
 }

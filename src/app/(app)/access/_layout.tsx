@@ -5,9 +5,9 @@ export default function AccessLayout() {
     <Tabs
       initialRouteName="permissions"
       tabs={[
-        { name: 'permissions', title: 'Permisos', icon: 'key' },
-        { name: 'reservations', title: 'Reservas', icon: 'calendar-check' },
-        { name: 'validations', title: 'Validaciones', icon: 'check-decagram', badge: 5 },
+        { name: 'permissions', title: 'Permisos', icon: 'key', route: '/access/permissions' },
+        { name: 'reservations', title: 'Reservas', icon: 'calendar-check', route: '/access/reservations' },
+        { name: 'validations', title: 'Validaciones', icon: 'check-decagram', badge: 5, route: '/access/validations' },
       ]}
     />
   );

@@ -5,8 +5,8 @@ export default function CredentialsLayout() {
     <Tabs
       initialRouteName="rfid"
       tabs={[
-        { name: 'rfid', title: 'RFID', icon: 'contactless-payment' },
-        { name: 'nfc', title: 'NFC', icon: 'nfc-variant' },
+        { name: 'rfid', title: 'RFID', icon: 'contactless-payment', route: '/credentials/rfid' },
+        { name: 'nfc', title: 'NFC', icon: 'nfc-variant', route: '/credentials/nfc' },
       ]}
     />
   );

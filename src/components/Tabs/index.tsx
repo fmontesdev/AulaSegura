@@ -1,97 +1,119 @@
 import React from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
-import { withLayoutContext } from 'expo-router';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { View, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { Text } from 'react-native-paper';
+import { Slot, usePathname, useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAppTheme } from '../../theme';
 import { TabProps } from '../../types/Tab';
 import { TabLabelWithBadge } from './components/TabLabelWithBadge';
 
-// Componente de pestañas superior para el dashboard
-const { Navigator } = createMaterialTopTabNavigator();
-export const MaterialTopTabs = withLayoutContext(Navigator);
-
-export default function Tabs({ initialRouteName, tabs }: TabProps) {
+// Barra de pestañas superior con navegación real en el historial
+export default function Tabs({ tabs }: TabProps) {
   const theme = useAppTheme();
+  const pathname = usePathname();
+  const router = useRouter();
   const { width } = useWindowDimensions();
-  
-  // En pantallas pequeñas, solo mostrar iconos
+
   const showOnlyIcons = width < 768;
 
   return (
-    <MaterialTopTabs
-      initialRouteName={initialRouteName}
-      screenOptions={{
-        tabBarActiveTintColor: theme.colors.secondary,
-        tabBarInactiveTintColor: theme.colors.grey,
-        tabBarStyle: [
+    <View style={styles.container}>
+      {/* Tab bar */}
+      <View
+        style={[
           styles.tabBar,
           {
             backgroundColor: theme.colors.surface,
             borderBottomColor: theme.colors.outlineVariant,
           },
-        ],
-        tabBarIndicatorStyle: [
-          styles.tabBarIndicator,
-          { backgroundColor: theme.colors.secondary },
-        ],
-        tabBarLabelStyle: styles.tabBarLabel,
-        tabBarItemStyle: showOnlyIcons ? styles.tabBarItemIconOnly : styles.tabBarItem,
-        tabBarScrollEnabled: false,
-        tabBarShowLabel: !showOnlyIcons,
-        tabBarShowIcon: true,
-        swipeEnabled: true,
-      }}
-    >
-      {tabs.map((tab) => (
-        <MaterialTopTabs.Screen
-          key={tab.name}
-          name={tab.name}
-          options={{
-            title: tab.title,
-            tabBarIcon: ({ color }: { color: string }) => (
+        ]}
+      >
+        {tabs.map((tab) => {
+          const isActive =
+            pathname === tab.route || pathname.startsWith(`${tab.route}/`);
+          const color = isActive ? theme.colors.secondary : theme.colors.grey;
+
+          return (
+            <Pressable
+              key={tab.name}
+              onPress={() => router.push(tab.route as any)}
+              style={[
+                styles.tabItem,
+                showOnlyIcons && styles.tabItemIconOnly,
+              ]}
+            >
               <MaterialCommunityIcons name={tab.icon} size={20} color={color} />
-            ),
-            ...(tab.badge !== undefined && {
-              tabBarLabel: ({ focused }: { focused: boolean }) => (
-                <TabLabelWithBadge 
-                  label={tab.title} 
-                  badge={tab.badge} 
-                  focused={focused} 
+
+              {!showOnlyIcons &&
+                (tab.badge !== undefined ? (
+                  <TabLabelWithBadge
+                    label={tab.title}
+                    badge={tab.badge}
+                    focused={isActive}
+                  />
+                ) : (
+                  <Text style={[styles.tabLabel, { color }]}>{tab.title}</Text>
+                ))}
+
+              {isActive && (
+                <View
+                  style={[
+                    styles.indicator,
+                    { backgroundColor: theme.colors.secondary },
+                  ]}
                 />
-              ),
-            }),
-          }}
-        />
-      ))}
-    </MaterialTopTabs>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* Contenido de la ruta activa */}
+      <View style={styles.content}>
+        <Slot />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   tabBar: {
-    elevation: 0,
-    shadowOpacity: 0,
+    flexDirection: 'row',
     borderBottomWidth: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    elevation: 0,
+    shadowOpacity: 0,
+    overflow: 'hidden',
   },
-  tabBarIndicator: {
-    height: 3,
+  tabItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+    position: 'relative',
   },
-  tabBarLabel: {
+  tabItemIconOnly: {
+    paddingHorizontal: 12,
+    minWidth: 60,
+    justifyContent: 'center',
+  },
+  tabLabel: {
     fontSize: 14,
     fontWeight: '600',
-    textTransform: 'none',
   },
-  tabBarItem: {
-    flexDirection: 'row',
-    width: 'auto',
+  indicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 3,
   },
-  tabBarItemIconOnly: {
-    flexDirection: 'row',
-    width: 'auto',
-    minWidth: 60,
-    paddingHorizontal: 12,
+  content: {
+    flex: 1,
   },
 });
