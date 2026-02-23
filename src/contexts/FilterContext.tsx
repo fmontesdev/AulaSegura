@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { useRouter, usePathname, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
 
@@ -9,85 +9,80 @@ interface FilterContextType {
   clearFilters: () => void;
 }
 
-const defaultContextValue: FilterContextType = {
+const FilterContext = createContext<FilterContextType>({
   filters: [],
   addFilter: () => {},
   removeFilter: () => {},
   clearFilters: () => {},
-};
+});
 
-const FilterContext = createContext<FilterContextType>(defaultContextValue);
+const isWeb = Platform.OS === 'web' && typeof window !== 'undefined';
 
 export function FilterProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useLocalSearchParams();
-  
+  // Inicializado con pathname para que la primera ejecución no cuente como navegación
+  const prevPathname = useRef(pathname);
+
   const [filters, setFilters] = useState<string[]>([]);
-  const isUpdatingFromURL = useRef(false);
+  const skipURLWrite = useRef(false);
 
-  // Parsear filtros desde URL
-  // En web, lee directamente de window.location para evitar problemas con useLocalSearchParams
-  const parseFiltersFromURL = useCallback((): string[] => {
-    const filtersParam = Platform.OS === 'web' && typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search).get('filters')
-      : searchParams.filters;
-    
-    if (!filtersParam) return [];
-    return String(filtersParam).split(',').filter(Boolean);
-  }, [searchParams.filters]);
-
-  // Sincronizar estado desde URL (URL -> Estado)
-  // Se ejecuta en: montaje inicial, cambio de ruta
+  // URL -> estado
+  // Al navegar a otra pantalla limpia los filtros; en carga inicial los restaura desde la URL
   useEffect(() => {
-    const urlFilters = parseFiltersFromURL();
-    const filtersMatch = JSON.stringify(urlFilters) === JSON.stringify(filters);
-    
-    if (!filtersMatch) {
-      isUpdatingFromURL.current = true;
-      setFilters(urlFilters);
-    }
-  }, [pathname, parseFiltersFromURL]);
+    const navigated = prevPathname.current !== pathname;
+    prevPathname.current = pathname;
 
-  // Sincronizar URL desde estado (Estado -> URL)
-  // Se ejecuta cuando el usuario agrega/quita chips
+    if (navigated) {
+      skipURLWrite.current = true;
+      setFilters([]);
+    } else {
+      const raw = isWeb
+        ? new URLSearchParams(window.location.search).get('filters')
+        : searchParams.filters as string | undefined;
+      const initial = raw ? String(raw).split(',').filter(Boolean) : [];
+      if (initial.length > 0) {
+        skipURLWrite.current = true;
+        setFilters(initial);
+      }
+    }
+  }, [pathname]);
+
+  // Estado -> URL
+  // Mantiene los query params sincronizados cuando el usuario agrega o quita chips
   // Usa replaceState para no crear entradas en el historial
   useEffect(() => {
-    // Si el cambio vino de la URL, no actualizar URL de nuevo (evitar loop)
-    if (isUpdatingFromURL.current) {
-      isUpdatingFromURL.current = false;
-      return;
-    }
+    if (skipURLWrite.current) { skipURLWrite.current = false; return; }
 
-    const filtersString = filters.length > 0 ? filters.join(',') : undefined;
-    
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    if (isWeb) {
       const url = new URL(window.location.href);
-      if (filtersString) {
-        url.searchParams.set('filters', filtersString);
+      url.searchParams.delete('filters');
+      if (filters.length > 0) {
+        // Añadimos filters manualmente para evitar que URLSearchParams codifique
+        // las comas como %2C, manteniendo la URL legible (?filters=eso,bio)
+        const separator = url.search ? '&' : '?';
+        window.history.replaceState({}, '', url.toString() + separator + 'filters=' + filters.join(','));
       } else {
-        url.searchParams.delete('filters');
+        window.history.replaceState({}, '', url.toString());
       }
-      window.history.replaceState({}, '', url.toString());
     } else {
-      router.setParams({ filters: filtersString });
+      router.setParams({ filters: filters.length > 0 ? filters.join(',') : undefined });
     }
-  }, [filters, router]);
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Función para agregar un filtro (chip)
   const addFilter = (filter: string) => {
     const trimmed = filter.trim();
-    if (trimmed && !filters.includes(trimmed)) {
-      setFilters(prev => [...prev, trimmed]);
-    }
+    if (trimmed && !filters.includes(trimmed)) setFilters(prev => [...prev, trimmed]);
   };
 
-  const removeFilter = (index: number) => {
+  // Función para eliminar un filtro por índice
+  const removeFilter = (index: number) =>
     setFilters(prev => prev.filter((_, i) => i !== index));
-  };
 
-  const clearFilters = () => {
-    setFilters([]);
-  };
+  // Función para limpiar todos los filtros
+  const clearFilters = () => setFilters([]);
 
   return (
     <FilterContext.Provider value={{ filters, addFilter, removeFilter, clearFilters }}>
@@ -97,6 +92,5 @@ export function FilterProvider({ children }: { children: ReactNode }) {
 }
 
 export function useFilters() {
-  const context = useContext(FilterContext);
-  return context;
+  return useContext(FilterContext);
 }

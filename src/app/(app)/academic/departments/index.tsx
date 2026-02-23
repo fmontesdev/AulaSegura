@@ -4,6 +4,7 @@ import { Text, ActivityIndicator, IconButton, Button } from 'react-native-paper'
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../../../theme';
 import { useFilters } from '../../../../contexts/FilterContext';
+import { usePaginationParams } from '../../../../hooks/usePaginationParams';
 import { useFilteredDepartments, useUpdateDepartment } from '../../../../hooks/queries/useDepartments';
 import { useExpandable } from '../../../../hooks/useExpandable';
 import { StyledChip } from '../../../../components/StyledChip';
@@ -21,18 +22,12 @@ export default function DepartmentsScreen() {
   const theme = useAppTheme();
   const router = useRouter();
   const { filters } = useFilters();
+  const { page: currentPage, limit: currentLimit, setPage, setLimit } = usePaginationParams({ filters });
   const [deactivateDialogVisible, setDeactivateDialogVisible] = useState(false);
   const [activateDialogVisible, setActivateDialogVisible] = useState(false);
   const [departmentToToggle, setDepartmentToToggle] = useState<Department | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [currentLimit, setCurrentLimit] = useState(10);
   const { toggle: toggleExpandSubjects, isExpanded: isSubjectsExpanded, reset: resetExpandedSubjects } = useExpandable();
   const { toggle: toggleExpandTeachers, isExpanded: isTeachersExpanded, reset: resetExpandedTeachers } = useExpandable();
-
-  // Resetear a página 1 cuando cambien los filtros
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filters]);
 
   // Limpiar expansiones cuando cambie la página
   useEffect(() => {
@@ -53,12 +48,11 @@ export default function DepartmentsScreen() {
   const pagination = departmentsResponse?.meta;
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setPage(page);
   };
 
   const handleLimitChange = (limit: number) => {
-    setCurrentLimit(limit);
-    setCurrentPage(1);
+    setLimit(limit);
   };
 
   const handleEdit = (department: Department) => {

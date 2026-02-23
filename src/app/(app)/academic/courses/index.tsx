@@ -4,6 +4,7 @@ import { Text, ActivityIndicator, IconButton, Button } from 'react-native-paper'
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../../../theme';
 import { useFilters } from '../../../../contexts/FilterContext';
+import { usePaginationParams } from '../../../../hooks/usePaginationParams';
 import { useCourses, useUpdateCourse } from '../../../../hooks/queries/useCourses';
 import { StyledChip } from '../../../../components/StyledChip';
 import { DataTable } from '../../../../components/DataTable';
@@ -20,16 +21,10 @@ export default function CoursesScreen() {
   const theme = useAppTheme();
   const router = useRouter();
   const { filters } = useFilters();
+  const { page: currentPage, limit: currentLimit, setPage, setLimit } = usePaginationParams({ filters });
   const [deactivateDialogVisible, setDeactivateDialogVisible] = useState(false);
   const [activateDialogVisible, setActivateDialogVisible] = useState(false);
   const [courseToToggle, setCourseToToggle] = useState<Course | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [currentLimit, setCurrentLimit] = useState(10);
-
-  // Resetear a página 1 cuando cambien los filtros
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filters]);
 
   // Hook de TanStack Query para obtener todos los cursos
   const { data: coursesResponse, isLoading, error, isFetching, refetch } = useCourses({
@@ -44,12 +39,11 @@ export default function CoursesScreen() {
   const pagination = coursesResponse?.meta;
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setPage(page);
   };
 
   const handleLimitChange = (limit: number) => {
-    setCurrentLimit(limit);
-    setCurrentPage(1);
+    setLimit(limit);
   };
 
   const handleEdit = (course: Course) => {
