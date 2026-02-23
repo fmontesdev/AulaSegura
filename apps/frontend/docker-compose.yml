@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build: .
+    container_name: aulasegura-reactnative
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules  # evita que el volumen sobreescriba node_modules del contenedor
