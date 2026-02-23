@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, ScrollView, Pressable } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAppTheme } from '../theme';
-import { addOpacity } from '../utils/colorUtils';
-import { useFilters } from '../contexts/FilterContext';
-import { StyledChip } from './StyledChip';
+import { Icon } from 'react-native-paper';
+import { useAppTheme } from '../../theme';
+import { addOpacity } from '../../utils/colorUtils';
+import { useFilters } from '../../contexts/FilterContext';
+import { StyledChip } from '../StyledChip';
 
 // Buscador global con sistema de filtros por chips
 export function GlobalSearch() {
   const theme = useAppTheme();
-  const { filters, addFilter, removeFilter } = useFilters();
+  const { filters, addFilter, removeFilter, clearFilters } = useFilters();
   const [inputValue, setInputValue] = useState('');
+  const [isClearHovered, setIsClearHovered] = useState(false);
 
   // Maneja tecla Enter o coma para agregar filtro
   const handleKeyPress = (e: any) => {
@@ -40,7 +41,7 @@ export function GlobalSearch() {
         borderWidth: 1,
       }
     ]}>
-      <MaterialCommunityIcons name="magnify" size={20} color={theme.colors.grey} />
+      <Icon source="magnify" size={22} color={theme.colors.grey} />
       
       <ScrollView 
         horizontal 
@@ -52,7 +53,8 @@ export function GlobalSearch() {
           <StyledChip
             key={index}
             text={filter}
-            variant={filter.includes(':') ? 'info' : 'default'}
+            // variant={filter.includes(':') ? 'info' : 'default'}
+            color={filter.includes(':') ? theme.colors.tertiary : theme.colors.grey}
             onClose={() => handleRemoveFilter(index)}
           />
         ))}
@@ -73,6 +75,25 @@ export function GlobalSearch() {
           onKeyPress={handleKeyPress}
         />
       </ScrollView>
+
+      {/* Añade botón para limpiar filtros */}
+      {filters.length > 0 && (
+        <Pressable
+          onPress={clearFilters}
+          onHoverIn={() => setIsClearHovered(true)}
+          onHoverOut={() => setIsClearHovered(false)}
+          style={[
+            styles.clearButton,
+            {
+              backgroundColor: isClearHovered ? addOpacity(theme.colors.secondary, 0.1) : 'transparent',
+              // @ts-ignore
+              transitionDuration: '200ms',
+            },
+          ]}
+        >
+          <Icon source="close" size={18} color={theme.colors.darkGrey} />
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -81,7 +102,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 13,
     paddingVertical: 5,
     borderRadius: 20,
     flex: 1,
@@ -102,5 +123,11 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     minWidth: 120,
+  },
+  clearButton: {
+    marginLeft: 6,
+    marginRight: -5,
+    padding: 5,
+    borderRadius: 20,
   },
 });

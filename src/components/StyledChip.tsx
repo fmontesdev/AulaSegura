@@ -1,8 +1,21 @@
-import React from 'react';
-import { StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-native';
-import { Chip } from 'react-native-paper';
+import React, { useState } from 'react';
+import { StyleSheet, StyleProp, ViewStyle, TextStyle, View } from 'react-native';
+import { Chip, Icon } from 'react-native-paper';
 import { useAppTheme } from '../theme';
 import { addOpacity } from '../utils/colorUtils';
+
+function CloseIcon({ defaultColor, hoverColor }: { defaultColor: string; hoverColor: string }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <View
+      // @ts-ignore
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <Icon source="close" size={18} color={hovered ? hoverColor : defaultColor} />
+    </View>
+  );
+}
 
 interface StyledChipProps {
   text?: string;
@@ -16,10 +29,10 @@ interface StyledChipProps {
 
 // Chip con borderRadius, texto con estilos, y backgroundColor con opacidad
 export function StyledChip({ 
-  text, 
-  children, 
-  color, 
-  style, 
+  text,
+  children,
+  color,
+  style,
   textStyle,
   onClose,
   onPress,
@@ -35,7 +48,7 @@ export function StyledChip({
       mode="flat"
       compact
       onClose={onClose}
-      closeIcon="close"
+      closeIcon={() => <CloseIcon defaultColor={theme.colors.darkGrey} hoverColor={theme.colors.secondary} />}
       onPress={onPress}
       rippleColor={addOpacity(chipColor, 0.16)}
       style={[

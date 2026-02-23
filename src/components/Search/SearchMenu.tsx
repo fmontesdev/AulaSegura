@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, TextInput } from 'react-native';
-import { Menu, Badge } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAppTheme } from '../theme';
-import { addOpacity } from '../utils/colorUtils';
-import { useFilters } from '../contexts/FilterContext';
-import { StyledChip } from './StyledChip';
+import { View, Pressable, TextInput } from 'react-native';
+import { Menu, Badge, Icon } from 'react-native-paper';
+import { useAppTheme } from '../../theme';
+import { addOpacity } from '../../utils/colorUtils';
+import { useFilters } from '../../contexts/FilterContext';
+import { StyledChip } from '../StyledChip';
+import { styles } from './SearchMenu.styles';
 
 // Menú de búsqueda global del Topbar (versión responsive para pantallas pequeñas)
 export function SearchMenu() {
   const theme = useAppTheme();
-  const { filters, addFilter, removeFilter } = useFilters();
+  const { filters, addFilter, removeFilter, clearFilters } = useFilters();
   const [visible, setVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isClearHovered, setIsClearHovered] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
   // Maneja tecla Enter o coma para agregar filtro
@@ -54,7 +55,7 @@ export function SearchMenu() {
             onHoverIn={() => setIsHovered(true)}
             onHoverOut={() => setIsHovered(false)}
           >
-            <MaterialCommunityIcons name="magnify" size={24} color={theme.colors.grey} />
+            <Icon source="magnify" size={24} color={theme.colors.grey} />
             {filters.length > 0 && (
               <Badge
                 size={18}
@@ -82,7 +83,7 @@ export function SearchMenu() {
               borderColor: addOpacity(theme.colors.secondary, 0.15),
             }
           ]}>
-            <MaterialCommunityIcons name="magnify" size={20} color={theme.colors.grey} />
+            <Icon source="magnify" size={20} color={theme.colors.grey} />
             
             <View style={styles.chipsAndInputContainer}>
               {/* Chips de filtros dentro del input */}
@@ -90,7 +91,8 @@ export function SearchMenu() {
                 <StyledChip
                   key={index}
                   text={filter}
-                  variant={filter.includes(':') ? 'info' : 'default'}
+                  // variant={filter.includes(':') ? 'info' : 'default'}
+                  color={filter.includes(':') ? theme.colors.tertiary : theme.colors.grey}
                   onClose={() => handleRemoveFilter(index)}
                 />
               ))}
@@ -111,6 +113,25 @@ export function SearchMenu() {
                 autoFocus
               />
             </View>
+
+            {/* Añade botón para limpiar filtros */}
+            {filters.length > 0 && (
+              <Pressable
+                onPress={clearFilters}
+                onHoverIn={() => setIsClearHovered(true)}
+                onHoverOut={() => setIsClearHovered(false)}
+                style={[
+                  styles.clearButton,
+                  {
+                    backgroundColor: isClearHovered ? addOpacity(theme.colors.secondary, 0.1) : 'transparent',
+                    // @ts-ignore
+                    transitionDuration: '200ms',
+                  },
+                ]}
+              >
+                <Icon source="close" size={18} color={theme.colors.darkGrey} />
+              </Pressable>
+            )}
           </View>
         </View>
       </Menu>
@@ -118,48 +139,3 @@ export function SearchMenu() {
   );
 }
 
-const styles = StyleSheet.create({
-  iconButton: {
-    padding: 8,
-    position: 'relative',
-  },
-  badge: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    fontSize: 10,
-  },
-  menu: {
-    marginTop: 64,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  menuContent: {
-    paddingHorizontal: 14,
-    paddingVertical: 3,
-    minWidth: 340,
-    maxWidth: 380,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  chipsAndInputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 5,
-    marginLeft: 8,
-  },
-  input: {
-    flex: 1,
-    minWidth: 120,
-    paddingVertical: 4,
-    outlineStyle: 'none',
-  } as any,
-});
